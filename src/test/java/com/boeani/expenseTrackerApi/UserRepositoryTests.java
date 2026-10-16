@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
@@ -22,10 +23,16 @@ public class UserRepositoryTests {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TestEntityManager testEntityManager;
+
     @Test
     void userIsCorrectlySavedAndLoaded() {
         User testUser = new User(TEST_EMAIL);
         User savedUser = userRepository.save(testUser);
+
+        testEntityManager.flush();
+        testEntityManager.clear();
 
         Long userId = savedUser.getId();
 
