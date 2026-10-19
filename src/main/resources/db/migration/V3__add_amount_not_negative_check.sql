@@ -1,0 +1,1 @@
+ALTER TABLE expenses ADD CONSTRAINT amount_not_negative CHECK (amount >= 0);
