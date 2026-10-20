@@ -10,6 +10,7 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -57,5 +58,14 @@ public class UserRepositoryTests {
         User sameUser = new User(TEST_EMAIL);
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(sameUser)).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void caseInsensitiveSameEmailTwiceShouldBeRejected() {
+        userRepository.saveAndFlush(testUser);
+
+        User capitalizedSameUser = new User(StringUtils.capitalize(TEST_EMAIL));
+
+        assertThatThrownBy(() -> userRepository.saveAndFlush(capitalizedSameUser)).isInstanceOf(DataIntegrityViolationException.class);
     }
 }
