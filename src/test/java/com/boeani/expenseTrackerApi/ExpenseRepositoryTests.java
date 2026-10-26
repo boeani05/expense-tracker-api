@@ -69,7 +69,7 @@ public class ExpenseRepositoryTests {
     }
 
     @Test
-    void negativeAmountExpenseShouldFail() {
+    void negativeAmountExpenseShouldBeRejected() {
         Expense testExpense = createExpenseWithAmount(new BigDecimal("-100.00"));
 
         assertThatThrownBy(() -> this.expenseRepository.saveAndFlush(testExpense)).isInstanceOf(DataIntegrityViolationException.class);
