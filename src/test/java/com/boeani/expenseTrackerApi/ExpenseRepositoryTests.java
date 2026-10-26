@@ -30,6 +30,7 @@ public class ExpenseRepositoryTests {
     private static final Category TEST_CATEGORY = Category.GROCERIES;
     private static final String TEST_DESCRIPTION = "Test Description";
     private static final LocalDate TEST_DATE = LocalDate.of(2026, 10, 1);
+    private static final BigDecimal TEST_AMOUNT = new BigDecimal("100.00");
 
     private User savedUser;
 
@@ -50,9 +51,7 @@ public class ExpenseRepositoryTests {
 
     @Test
     void addedExpenseOfUserIsSavedAndLoaded() {
-        BigDecimal testAmount = new BigDecimal("100.00");
-
-        Expense savedExpense = expenseRepository.saveAndFlush(createExpenseWithAmount(testAmount));
+        Expense savedExpense = expenseRepository.saveAndFlush(createExpenseWithAmount(TEST_AMOUNT));
 
         testEntityManager.clear();
 
@@ -62,7 +61,7 @@ public class ExpenseRepositoryTests {
 
         Expense loadedExpense = foundExpense.orElseThrow();
 
-        assertThat(loadedExpense.getAmount()).isEqualTo(testAmount);
+        assertThat(loadedExpense.getAmount()).isEqualTo(TEST_AMOUNT);
         assertThat(loadedExpense.getCategory()).isEqualTo(TEST_CATEGORY);
         assertThat(loadedExpense.getDescription()).isEqualTo(TEST_DESCRIPTION);
         assertThat(loadedExpense.getExpenseDate()).isEqualTo(TEST_DATE);
@@ -79,6 +78,27 @@ public class ExpenseRepositoryTests {
     @Test
     void nullAmountShouldBeRejected() {
         Expense nullTestExpense = createExpenseWithAmount(null);
+
+        assertThatThrownBy(() -> expenseRepository.saveAndFlush(nullTestExpense)).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void nullCategoryShouldBeRejected() {
+        Expense nullTestExpense = new Expense(TEST_AMOUNT, null, TEST_DESCRIPTION, TEST_DATE, savedUser);
+
+        assertThatThrownBy(() -> expenseRepository.saveAndFlush(nullTestExpense)).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void nullDescriptionShouldBeRejected() {
+        Expense nullTestExpense = new Expense(TEST_AMOUNT, TEST_CATEGORY, null, TEST_DATE, savedUser);
+
+        assertThatThrownBy(() -> expenseRepository.saveAndFlush(nullTestExpense)).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void nullExpenseDateShouldBeRejected() {
+        Expense nullTestExpense = new Expense(TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, null, savedUser);
 
         assertThatThrownBy(() -> expenseRepository.saveAndFlush(nullTestExpense)).isInstanceOf(DataIntegrityViolationException.class);
     }
