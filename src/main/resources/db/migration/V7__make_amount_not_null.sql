@@ -1,0 +1,1 @@
+ALTER TABLE expenses ALTER COLUMN amount SET NOT NULL;

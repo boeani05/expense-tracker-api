@@ -76,6 +76,13 @@ public class ExpenseRepositoryTests {
         assertThatThrownBy(() -> this.expenseRepository.saveAndFlush(testExpense)).isInstanceOf(DataIntegrityViolationException.class);
     }
 
+    @Test
+    void nullAmountShouldBeRejected() {
+        Expense nullTestExpense = createExpenseWithAmount(null);
+
+        assertThatThrownBy(() -> expenseRepository.saveAndFlush(nullTestExpense)).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
     private Expense createExpenseWithAmount(BigDecimal amount) {
         return new Expense(amount, TEST_CATEGORY, TEST_DESCRIPTION, TEST_DATE, savedUser);
     }
