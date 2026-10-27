@@ -5,6 +5,7 @@ import com.boeani.expenseTrackerApi.entities.Expense;
 import com.boeani.expenseTrackerApi.entities.User;
 import com.boeani.expenseTrackerApi.repositories.ExpenseRepository;
 import com.boeani.expenseTrackerApi.repositories.UserRepository;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +109,19 @@ public class ExpenseRepositoryTests {
         Expense nullTestExpense = new Expense(TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, TEST_DATE, null);
 
         assertThatThrownBy(() -> expenseRepository.saveAndFlush(nullTestExpense)).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void nonExistingUserShouldBeRejected() {
+        assertThatThrownBy(() -> testEntityManager.getEntityManager()
+                .createNativeQuery("INSERT INTO expenses (amount, category, description, expense_date, user_id) VALUES (?1, ?2, ?3, ?4, ?5)")
+                .setParameter(1, TEST_AMOUNT)
+                .setParameter(2, TEST_CATEGORY)
+                .setParameter(3, TEST_DESCRIPTION)
+                .setParameter(4, TEST_DATE)
+                .setParameter(5, 999)
+                .executeUpdate())
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     private Expense createExpenseWithAmount(BigDecimal amount) {
