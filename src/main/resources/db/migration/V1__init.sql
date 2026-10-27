@@ -1,4 +1,4 @@
 CREATE TABLE users (
-    id bigserial PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     email VARCHAR(255)
 );
