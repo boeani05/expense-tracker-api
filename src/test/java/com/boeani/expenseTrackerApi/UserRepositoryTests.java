@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class UserRepositoryTests {
 
     private static final String TEST_EMAIL = "max@x.at";
+    private static final String TEST_PASSWORD_HASH = "123";
 
     private User testUser;
 
@@ -34,7 +35,7 @@ public class UserRepositoryTests {
 
     @BeforeEach
     void initializeUser() {
-        testUser = new User(TEST_EMAIL);
+        testUser = new User(TEST_EMAIL, TEST_PASSWORD_HASH);
     }
 
     @Test
@@ -55,7 +56,7 @@ public class UserRepositoryTests {
     void sameEmailTwiceShouldReject() {
         userRepository.saveAndFlush(testUser);
 
-        User sameUser = new User(TEST_EMAIL);
+        User sameUser = new User(TEST_EMAIL, TEST_PASSWORD_HASH);
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(sameUser)).isInstanceOf(DataIntegrityViolationException.class);
     }
@@ -64,14 +65,14 @@ public class UserRepositoryTests {
     void caseInsensitiveSameEmailTwiceShouldBeRejected() {
         userRepository.saveAndFlush(testUser);
 
-        User capitalizedSameUser = new User(StringUtils.capitalize(TEST_EMAIL));
+        User capitalizedSameUser = new User(StringUtils.capitalize(TEST_EMAIL), TEST_PASSWORD_HASH);
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(capitalizedSameUser)).isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
     void nullEmailShouldBeRejected() {
-        User nullTestUser = new User(null);
+        User nullTestUser = new User(null, TEST_PASSWORD_HASH);
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(nullTestUser)).isInstanceOf(DataIntegrityViolationException.class);
     }

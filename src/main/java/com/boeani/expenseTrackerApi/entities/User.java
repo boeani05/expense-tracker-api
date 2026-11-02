@@ -13,10 +13,13 @@ public class User {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
+    private String passwordHash;
+
     private String email;
 
-    public User(String email) {
+    public User(String email, String passwordHash) {
         this.email = email;
+        this.passwordHash = passwordHash;
     }
 
     protected User() {
@@ -28,5 +31,9 @@ public class User {
 
     public String getEmail() {
         return this.email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 }

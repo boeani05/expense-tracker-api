@@ -1,14 +1,19 @@
 package com.boeani.expenseTrackerApi;
 
+import com.boeani.expenseTrackerApi.entities.User;
+import com.boeani.expenseTrackerApi.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,19 +30,39 @@ public class UserRegistrationTests {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Test
     void registrationIsSuccessful() throws Exception {
-        mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(String.format("""
-                                {
-                                    "email": "%s",
-                                    "password": "%s"
-                                }
-                                """, TEST_EMAIL, TEST_PASSWORD)))
+        mockMvc.perform(postTestJsonBody())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value(TEST_EMAIL))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.password").doesNotExist());
+    }
+
+    @Test
+    void passwordIsSavedHashed() throws Exception {
+        mockMvc.perform(postTestJsonBody());
+
+        User testUser = userRepository.findByEmail(TEST_EMAIL).orElseThrow();
+
+        assertThat(testUser.getPasswordHash()).isNotEqualTo(TEST_PASSWORD);
+        assertThat(passwordEncoder.matches(TEST_PASSWORD, testUser.getPasswordHash())).isEqualTo(true);
+    }
+
+    private MockHttpServletRequestBuilder postTestJsonBody() {
+        return post("/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format("""
+                        {
+                            "email": "%s",
+                            "password": "%s"
+                        }
+                        """, TEST_EMAIL, TEST_PASSWORD));
     }
 }

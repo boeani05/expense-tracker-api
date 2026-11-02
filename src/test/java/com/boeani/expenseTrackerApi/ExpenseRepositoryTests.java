@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class ExpenseRepositoryTests {
 
     private static final String TEST_EMAIL = "max@x.at";
+    private static final String TEST_PASSWORD_HASH = "123";
     private static final Category TEST_CATEGORY = Category.GROCERIES;
     private static final String TEST_DESCRIPTION = "Test Description";
     private static final LocalDate TEST_DATE = LocalDate.of(2026, 10, 1);
@@ -46,7 +47,7 @@ public class ExpenseRepositoryTests {
 
     @BeforeEach
     void initializeUser() {
-        User testUser = new User(TEST_EMAIL);
+        User testUser = new User(TEST_EMAIL, TEST_PASSWORD_HASH);
         savedUser = userRepository.saveAndFlush(testUser);
     }
 
