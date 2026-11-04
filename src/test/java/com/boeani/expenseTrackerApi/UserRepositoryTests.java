@@ -76,4 +76,11 @@ public class UserRepositoryTests {
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(nullTestUser)).isInstanceOf(DataIntegrityViolationException.class);
     }
+
+    @Test
+    void nullPasswordHashShouldBeRejected() {
+        User nullPasswordUser = new User(TEST_EMAIL, null);
+
+        assertThatThrownBy(() -> userRepository.saveAndFlush(nullPasswordUser)).isInstanceOf(DataIntegrityViolationException.class);
+    }
 }
