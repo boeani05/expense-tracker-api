@@ -63,6 +63,18 @@ public class UserRegistrationTests {
                 .andExpect(status().isConflict());
     }
 
+    @Test
+    void missingEmailOnRegisterShouldBeRejected() throws Exception {
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.format("""
+                                {
+                                    "password": "%s"
+                                }
+                                """, TEST_PASSWORD)))
+                .andExpect(status().isBadRequest());
+    }
+
     private MockHttpServletRequestBuilder postTestJsonBody() {
         return post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
