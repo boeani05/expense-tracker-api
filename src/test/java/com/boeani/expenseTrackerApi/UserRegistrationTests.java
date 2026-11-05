@@ -38,7 +38,7 @@ public class UserRegistrationTests {
 
     @Test
     void registrationIsSuccessful() throws Exception {
-        mockMvc.perform(postTestJsonBody())
+        mockMvc.perform(postTestJsonBody(TEST_EMAIL))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value(TEST_EMAIL))
                 .andExpect(jsonPath("$.id").exists())
@@ -47,7 +47,7 @@ public class UserRegistrationTests {
 
     @Test
     void passwordIsSavedHashed() throws Exception {
-        mockMvc.perform(postTestJsonBody());
+        mockMvc.perform(postTestJsonBody(TEST_EMAIL));
 
         User testUser = userRepository.findByEmail(TEST_EMAIL).orElseThrow();
 
@@ -57,9 +57,9 @@ public class UserRegistrationTests {
 
     @Test
     void nonUniqueEmailShouldBeRejected() throws Exception {
-        mockMvc.perform(postTestJsonBody());
+        mockMvc.perform(postTestJsonBody(TEST_EMAIL));
 
-        mockMvc.perform(postTestJsonBody())
+        mockMvc.perform(postTestJsonBody(TEST_EMAIL))
                 .andExpect(status().isConflict());
     }
 
@@ -75,7 +75,13 @@ public class UserRegistrationTests {
                 .andExpect(status().isBadRequest());
     }
 
-    private MockHttpServletRequestBuilder postTestJsonBody() {
+    @Test
+    void emptyEmailOnRegisterShouldBeRejected() throws Exception {
+        mockMvc.perform(postTestJsonBody(""))
+                .andExpect(status().isBadRequest());
+    }
+
+    private MockHttpServletRequestBuilder postTestJsonBody(String email) {
         return post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format("""
@@ -83,6 +89,6 @@ public class UserRegistrationTests {
                             "email": "%s",
                             "password": "%s"
                         }
-                        """, TEST_EMAIL, TEST_PASSWORD));
+                        """, email, TEST_PASSWORD));
     }
 }
