@@ -12,4 +12,9 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     void handleEmailAlreadyRegistered() {
     }
+
+    @ExceptionHandler(value = InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    void handleInvalidCredentials() {
+    }
 }

@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +37,7 @@ public class UserRegistrationTests {
 
     @Test
     void registrationIsSuccessful() throws Exception {
-        mockMvc.perform(postTestJsonBody(TEST_EMAIL))
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value(TEST_EMAIL))
                 .andExpect(jsonPath("$.id").exists())
@@ -47,7 +46,7 @@ public class UserRegistrationTests {
 
     @Test
     void passwordIsSavedHashed() throws Exception {
-        mockMvc.perform(postTestJsonBody(TEST_EMAIL));
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL));
 
         User testUser = userRepository.findByEmail(TEST_EMAIL).orElseThrow();
 
@@ -57,9 +56,9 @@ public class UserRegistrationTests {
 
     @Test
     void nonUniqueEmailShouldBeRejected() throws Exception {
-        mockMvc.perform(postTestJsonBody(TEST_EMAIL));
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL));
 
-        mockMvc.perform(postTestJsonBody(TEST_EMAIL))
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL))
                 .andExpect(status().isConflict());
     }
 
@@ -77,18 +76,7 @@ public class UserRegistrationTests {
 
     @Test
     void emptyEmailOnRegisterShouldBeRejected() throws Exception {
-        mockMvc.perform(postTestJsonBody(""))
+        mockMvc.perform(AuthTestRequests.register(""))
                 .andExpect(status().isBadRequest());
-    }
-
-    private MockHttpServletRequestBuilder postTestJsonBody(String email) {
-        return post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(String.format("""
-                        {
-                            "email": "%s",
-                            "password": "%s"
-                        }
-                        """, email, TEST_PASSWORD));
     }
 }
