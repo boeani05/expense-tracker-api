@@ -7,17 +7,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 public class AuthTestRequests {
 
-    private static final String TEST_PASSWORD = "123";
-
-    public static MockHttpServletRequestBuilder register(String email) {
-        return withJsonBody(post("/auth/register"), email);
+    public static MockHttpServletRequestBuilder register(String email, String password) {
+        return withJsonBody(post("/auth/register"), email, password);
     }
 
-    public static MockHttpServletRequestBuilder login(String email) {
-        return withJsonBody(post("/auth/login"), email);
+    public static MockHttpServletRequestBuilder login(String email, String password) {
+        return withJsonBody(post("/auth/login"), email, password);
     }
 
-    private static MockHttpServletRequestBuilder withJsonBody(MockHttpServletRequestBuilder request, String email) {
+    private static MockHttpServletRequestBuilder withJsonBody(MockHttpServletRequestBuilder request, String email, String password) {
         return request
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format("""
@@ -25,6 +23,6 @@ public class AuthTestRequests {
                             "email": "%s",
                             "password": "%s"
                         }
-                        """, email, TEST_PASSWORD));
+                        """, email, password));
     }
 }

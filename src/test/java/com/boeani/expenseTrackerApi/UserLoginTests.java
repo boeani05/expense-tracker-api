@@ -18,22 +18,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserLoginTests {
 
     private static final String TEST_EMAIL = "max@x.at";
+    private static final String TEST_PASSWORD = "123";
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     void unknownEmailShouldBeRejected() throws Exception {
-        mockMvc.perform(AuthTestRequests.login("unknown@email.at"))
+        mockMvc.perform(AuthTestRequests.login("unknown@email.at", TEST_PASSWORD))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void userIsLoggedInSuccessfully() throws Exception {
-        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL));
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD));
 
-        mockMvc.perform(AuthTestRequests.login(TEST_EMAIL))
+        mockMvc.perform(AuthTestRequests.login(TEST_EMAIL, TEST_PASSWORD))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty());
+    }
+
+    @Test
+    void unknownPasswordShouldBeRejected() throws Exception {
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD));
+
+        mockMvc.perform(AuthTestRequests.login(TEST_EMAIL, "wrong_password"))
+                .andExpect(status().isUnauthorized());
     }
 }

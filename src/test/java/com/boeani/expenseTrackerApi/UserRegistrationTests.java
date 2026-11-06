@@ -37,7 +37,7 @@ public class UserRegistrationTests {
 
     @Test
     void registrationIsSuccessful() throws Exception {
-        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL))
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value(TEST_EMAIL))
                 .andExpect(jsonPath("$.id").exists())
@@ -46,7 +46,7 @@ public class UserRegistrationTests {
 
     @Test
     void passwordIsSavedHashed() throws Exception {
-        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL));
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD));
 
         User testUser = userRepository.findByEmail(TEST_EMAIL).orElseThrow();
 
@@ -56,9 +56,9 @@ public class UserRegistrationTests {
 
     @Test
     void nonUniqueEmailShouldBeRejected() throws Exception {
-        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL));
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD));
 
-        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL))
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD))
                 .andExpect(status().isConflict());
     }
 
@@ -76,7 +76,7 @@ public class UserRegistrationTests {
 
     @Test
     void emptyEmailOnRegisterShouldBeRejected() throws Exception {
-        mockMvc.perform(AuthTestRequests.register(""))
+        mockMvc.perform(AuthTestRequests.register("", TEST_PASSWORD))
                 .andExpect(status().isBadRequest());
     }
 }
