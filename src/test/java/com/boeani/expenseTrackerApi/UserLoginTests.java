@@ -45,4 +45,10 @@ public class UserLoginTests {
         mockMvc.perform(AuthTestRequests.login(TEST_EMAIL, "wrong_password"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void emptyEmailOnLoginShouldBeRejected() throws Exception {
+        mockMvc.perform(AuthTestRequests.login("", TEST_PASSWORD))
+                .andExpect(status().isBadRequest());
+    }
 }

@@ -1,7 +1,9 @@
 package com.boeani.expenseTrackerApi.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record LoginRequest(
-        String email,
+        @NotBlank String email,
         String password
 ) {
 }
