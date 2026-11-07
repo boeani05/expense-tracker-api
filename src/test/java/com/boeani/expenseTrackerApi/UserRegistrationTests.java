@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.boeani.expenseTrackerApi.TestData.TEST_EMAIL;
+import static com.boeani.expenseTrackerApi.TestData.TEST_PASSWORD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,9 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @Import(TestcontainersConfiguration.class)
 public class UserRegistrationTests {
-
-    private static final String TEST_EMAIL = "max@x.at";
-    private static final String TEST_PASSWORD = "123";
 
     @Autowired
     private MockMvc mockMvc;
@@ -77,6 +76,18 @@ public class UserRegistrationTests {
     @Test
     void emptyEmailOnRegisterShouldBeRejected() throws Exception {
         mockMvc.perform(AuthTestRequests.register("", TEST_PASSWORD))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void emptyPasswordOnRegisterShouldBeRejected() throws Exception {
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, ""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void passwordSmallerThanMinSizeOnRegisterShouldBeRejected() throws Exception {
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, "1234567"))
                 .andExpect(status().isBadRequest());
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.boeani.expenseTrackerApi.TestData.TEST_EMAIL;
+import static com.boeani.expenseTrackerApi.TestData.TEST_PASSWORD;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,9 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @Import(TestcontainersConfiguration.class)
 public class UserLoginTests {
-
-    private static final String TEST_EMAIL = "max@x.at";
-    private static final String TEST_PASSWORD = "123";
 
     @Autowired
     private MockMvc mockMvc;

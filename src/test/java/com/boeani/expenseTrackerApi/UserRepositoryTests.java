@@ -14,6 +14,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
+import static com.boeani.expenseTrackerApi.TestData.TEST_EMAIL;
+import static com.boeani.expenseTrackerApi.TestData.TEST_PASSWORD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -21,9 +23,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Import(TestcontainersConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTests {
-
-    private static final String TEST_EMAIL = "max@x.at";
-    private static final String TEST_PASSWORD_HASH = "123";
 
     private User testUser;
 
@@ -35,7 +34,7 @@ public class UserRepositoryTests {
 
     @BeforeEach
     void initializeUser() {
-        testUser = new User(TEST_EMAIL, TEST_PASSWORD_HASH);
+        testUser = new User(TEST_EMAIL, TEST_PASSWORD);
     }
 
     @Test
@@ -56,7 +55,7 @@ public class UserRepositoryTests {
     void sameEmailTwiceShouldReject() {
         userRepository.saveAndFlush(testUser);
 
-        User sameUser = new User(TEST_EMAIL, TEST_PASSWORD_HASH);
+        User sameUser = new User(TEST_EMAIL, TEST_PASSWORD);
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(sameUser)).isInstanceOf(DataIntegrityViolationException.class);
     }
@@ -65,14 +64,14 @@ public class UserRepositoryTests {
     void caseInsensitiveSameEmailTwiceShouldBeRejected() {
         userRepository.saveAndFlush(testUser);
 
-        User capitalizedSameUser = new User(StringUtils.capitalize(TEST_EMAIL), TEST_PASSWORD_HASH);
+        User capitalizedSameUser = new User(StringUtils.capitalize(TEST_EMAIL), TEST_PASSWORD);
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(capitalizedSameUser)).isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
     void nullEmailShouldBeRejected() {
-        User nullTestUser = new User(null, TEST_PASSWORD_HASH);
+        User nullTestUser = new User(null, TEST_PASSWORD);
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(nullTestUser)).isInstanceOf(DataIntegrityViolationException.class);
     }
