@@ -90,4 +90,10 @@ public class UserRegistrationTests {
         mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, "1234567"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void passwordBiggerThanMaxSizeOnRegisterShouldBeRejected() throws Exception {
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, "1".repeat(73)))
+                .andExpect(status().isBadRequest());
+    }
 }
