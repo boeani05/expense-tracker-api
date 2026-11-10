@@ -56,4 +56,12 @@ public class UserLoginTests {
         mockMvc.perform(AuthTestRequests.login(TEST_EMAIL, ""))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void passwordExceedingMaxBytesOnLoginShouldBeRejected() throws Exception {
+        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD));
+
+        mockMvc.perform(AuthTestRequests.login(TEST_EMAIL, "ä".repeat(37)))
+                .andExpect(status().isUnauthorized());
+    }
 }
