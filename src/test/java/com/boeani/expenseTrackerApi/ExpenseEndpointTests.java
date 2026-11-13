@@ -33,17 +33,21 @@ public class ExpenseEndpointTests {
 
     @Test
     void callingExpensesEndpointWithValidJwtShouldBeSuccessful() throws Exception {
-        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD));
-
-        String responseBody = mockMvc.perform(AuthTestRequests.login(TEST_EMAIL, TEST_PASSWORD))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String jwt = JsonPath.read(responseBody, "$.token");
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
         mockMvc.perform(get("/expenses")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void corruptJwtShouldBeRejected() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        String corruptedJwt = jwt.substring(0, jwt.length() - 1);
+
+        mockMvc.perform(get("/expenses")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + corruptedJwt))
+                .andExpect(status().isUnauthorized());
     }
 }

@@ -77,14 +77,7 @@ public class UserLoginTests {
 
     @Test
     void jwtTokenShouldBeValid() throws Exception {
-        mockMvc.perform(AuthTestRequests.register(TEST_EMAIL, TEST_PASSWORD));
-
-        String responseBody = mockMvc.perform(AuthTestRequests.login(TEST_EMAIL, TEST_PASSWORD))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String jwt = JsonPath.read(responseBody, "$.token");
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
         String email = Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
