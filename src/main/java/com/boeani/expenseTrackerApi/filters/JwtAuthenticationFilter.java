@@ -1,7 +1,6 @@
 package com.boeani.expenseTrackerApi.filters;
 
 import com.boeani.expenseTrackerApi.services.JwtService;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,13 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (header != null && header.startsWith(BEARER)) {
-            try {
-                String email = jwtService.extractEmail(header.substring(BEARER.length()));
+            jwtService.extractEmail(header.substring(BEARER.length())).ifPresent(email -> {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (JwtException _) {
-                // invalid token -> nothing in catch, entry point answers with 401
-            }
+            });
         }
         filterChain.doFilter(request, response);
     }
