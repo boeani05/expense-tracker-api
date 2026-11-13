@@ -22,10 +22,12 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public LoginService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public LoginService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public String loginUser(String email, String password) {
@@ -36,9 +38,6 @@ public class LoginService {
             throw new InvalidCredentialsException(INVALID_CREDENTIALS);
         }
 
-        return Jwts.builder()
-                .subject(correctUser.getEmail())
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
-                .compact();
+        return jwtService.generateToken(email);
     }
 }
