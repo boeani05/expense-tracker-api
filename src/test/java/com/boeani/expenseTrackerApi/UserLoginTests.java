@@ -1,6 +1,6 @@
 package com.boeani.expenseTrackerApi;
 
-import com.jayway.jsonpath.JsonPath;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Date;
 
 import static com.boeani.expenseTrackerApi.TestData.TEST_EMAIL;
 import static com.boeani.expenseTrackerApi.TestData.TEST_PASSWORD;
@@ -79,13 +81,31 @@ public class UserLoginTests {
     void jwtTokenShouldBeValid() throws Exception {
         String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
-        String email = Jwts.parser()
+        String email = getJwtPayload(jwt).getSubject();
+
+        assertThat(email).isEqualTo(TEST_EMAIL);
+    }
+
+    @Test
+    void differenceBetweenCreationAndExpirationShouldBeTenMinutes() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        Claims jwtPayload = getJwtPayload(jwt);
+
+        Date issuedAt = jwtPayload.getIssuedAt();
+
+        Date expiration = jwtPayload.getExpiration();
+
+        Duration timeDifference = Duration.between(issuedAt.toInstant(), expiration.toInstant());
+
+        assertThat(timeDifference.getSeconds()).isEqualTo(600L);
+    }
+
+    private Claims getJwtPayload(String jwt) {
+        return Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseSignedClaims(jwt)
-                .getPayload()
-                .getSubject();
-
-        assertThat(email).isEqualTo(TEST_EMAIL);
+                .getPayload();
     }
 }
