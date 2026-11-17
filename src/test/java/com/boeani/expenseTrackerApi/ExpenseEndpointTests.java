@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static com.boeani.expenseTrackerApi.TestData.TEST_EMAIL;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,8 +40,7 @@ public class ExpenseEndpointTests {
     void callingExpensesEndpointWithValidJwtShouldBeSuccessful() throws Exception {
         String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
-        mockMvc.perform(get("/expenses")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt))
+        mockMvc.perform(ExpenseTestRequests.listExpenses(jwt))
                 .andExpect(status().isOk());
     }
 
@@ -53,14 +50,12 @@ public class ExpenseEndpointTests {
 
         String corruptedJwt = jwt.substring(0, jwt.length() - 1);
 
-        mockMvc.perform(get("/expenses")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + corruptedJwt))
+        mockMvc.perform(ExpenseTestRequests.listExpenses(corruptedJwt))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void expiredTokenShouldBeRejected() throws Exception {
-
         Date now = new Date();
 
         Date issuedAt = new Date(now.getTime() - 660_000L);
@@ -73,8 +68,7 @@ public class ExpenseEndpointTests {
                 .expiration(expiration)
                 .compact();
 
-        mockMvc.perform(get("/expenses")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + expiredJwt))
+        mockMvc.perform(ExpenseTestRequests.listExpenses(expiredJwt))
                 .andExpect(status().isUnauthorized());
     }
 }

@@ -5,7 +5,10 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-public class AuthTestRequests {
+public final class AuthTestRequests {
+
+    private AuthTestRequests() {
+    }
 
     public static MockHttpServletRequestBuilder register(String email, String password) {
         return withJsonBody(post("/auth/register"), email, password);
