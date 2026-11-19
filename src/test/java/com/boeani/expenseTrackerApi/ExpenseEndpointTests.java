@@ -20,6 +20,7 @@ import java.util.Date;
 
 import static com.boeani.expenseTrackerApi.TestData.TEST_EMAIL;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -96,5 +97,27 @@ public class ExpenseEndpointTests {
                                 }
                                 """, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, TEST_EXPENSE_DATE)))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void creatingExpenseResponseBodyShouldBeFilledCorrectly() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.format("""
+                                {
+                                    "amount": %s,
+                                    "category": "%s",
+                                    "description": "%s",
+                                    "expenseDate": "%s"
+                                }
+                                """, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, TEST_EXPENSE_DATE)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.amount").value(TEST_AMOUNT.doubleValue()))
+                .andExpect(jsonPath("$.category").value(TEST_CATEGORY.name()))
+                .andExpect(jsonPath("$.description").value(TEST_DESCRIPTION))
+                .andExpect(jsonPath("$.expenseDate").value(TEST_EXPENSE_DATE.toString()));
     }
 }
