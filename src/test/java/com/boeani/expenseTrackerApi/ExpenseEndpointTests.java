@@ -1,5 +1,6 @@
 package com.boeani.expenseTrackerApi;
 
+import com.boeani.expenseTrackerApi.entities.Category;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
@@ -8,10 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 
 import static com.boeani.expenseTrackerApi.TestData.TEST_EMAIL;
@@ -23,6 +27,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @Import(TestcontainersConfiguration.class)
 public class ExpenseEndpointTests {
+
+    private static final BigDecimal TEST_AMOUNT = new BigDecimal("100.00");
+    private static final Category TEST_CATEGORY = Category.GROCERIES;
+    private static final String TEST_DESCRIPTION = "Test description";
+    private static final LocalDate TEST_EXPENSE_DATE = LocalDate.now();
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,5 +79,22 @@ public class ExpenseEndpointTests {
 
         mockMvc.perform(ExpenseTestRequests.listExpenses(expiredJwt))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void creatingExpenseShouldBeSuccessful() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.format("""
+                                {
+                                    "amount": %s,
+                                    "category": "%s",
+                                    "description": "%s",
+                                    "expenseDate": "%s"
+                                }
+                                """, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, TEST_EXPENSE_DATE)))
+                .andExpect(status().isCreated());
     }
 }
