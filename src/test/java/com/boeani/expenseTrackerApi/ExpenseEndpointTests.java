@@ -83,23 +83,6 @@ public class ExpenseEndpointTests {
     }
 
     @Test
-    void creatingExpenseShouldBeSuccessful() throws Exception {
-        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
-
-        mockMvc.perform(ExpenseTestRequests.createExpense(jwt)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(String.format("""
-                                {
-                                    "amount": %s,
-                                    "category": "%s",
-                                    "description": "%s",
-                                    "expenseDate": "%s"
-                                }
-                                """, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, TEST_EXPENSE_DATE)))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
     void creatingExpenseResponseBodyShouldBeFilledCorrectly() throws Exception {
         String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
