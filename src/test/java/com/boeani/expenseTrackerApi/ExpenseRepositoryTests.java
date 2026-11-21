@@ -1,6 +1,5 @@
 package com.boeani.expenseTrackerApi;
 
-import com.boeani.expenseTrackerApi.entities.Category;
 import com.boeani.expenseTrackerApi.entities.Expense;
 import com.boeani.expenseTrackerApi.entities.User;
 import com.boeani.expenseTrackerApi.repositories.ExpenseRepository;
@@ -16,11 +15,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Optional;
 
-import static com.boeani.expenseTrackerApi.TestData.TEST_EMAIL;
-import static com.boeani.expenseTrackerApi.TestData.TEST_PASSWORD;
+import static com.boeani.expenseTrackerApi.TestData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -28,11 +25,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Import(TestcontainersConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ExpenseRepositoryTests {
-
-    private static final Category TEST_CATEGORY = Category.GROCERIES;
-    private static final String TEST_DESCRIPTION = "Test Description";
-    private static final LocalDate TEST_DATE = LocalDate.of(2026, 10, 1);
-    private static final BigDecimal TEST_AMOUNT = new BigDecimal("100.00");
 
     private User savedUser;
 
