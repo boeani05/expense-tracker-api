@@ -95,9 +95,26 @@ public class ExpenseEndpointTests {
     }
 
     @Test
-    void creatingExpenseWithEmptyCategoryShouldBeRejected() throws Exception {
+    void creatingExpenseWithNullCategoryShouldBeRejected() throws Exception {
         String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
-        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, null, TEST_DESCRIPTION, TEST_DATE));
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, null, TEST_DESCRIPTION, TEST_DATE))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void creatingExpenseWithNullDescriptionShouldBeRejected() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, null, TEST_DATE))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void creatingExpenseWithEmptyDescriptionShouldBeCreated() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, "", TEST_DATE))
+                .andExpect(status().isCreated());
     }
 }
