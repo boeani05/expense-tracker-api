@@ -15,6 +15,8 @@ import java.time.LocalDate;
 @Service
 public class ExpenseService {
 
+    private static final String EXPENSE_DATE_IN_FUTURE = "The entered expense date is in the future. Select a valid date!";
+
     private final UserRepository userRepository;
     private final ExpenseRepository expenseRepository;
     private final Clock clock;
@@ -26,9 +28,8 @@ public class ExpenseService {
     }
 
     public ExpenseResponse createExpense(CreateExpenseRequest expenseRequest, String email) {
-
         if (expenseRequest.expenseDate().isAfter(LocalDate.now(clock))) {
-            throw new ExpenseDateInFutureException("The entered expense date is in the future. Select a valid date!");
+            throw new ExpenseDateInFutureException(EXPENSE_DATE_IN_FUTURE);
         }
 
         User user = userRepository.findByEmail(email).orElseThrow();
