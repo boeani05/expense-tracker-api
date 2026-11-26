@@ -3,6 +3,7 @@ package com.boeani.expenseTrackerApi.controllers;
 import com.boeani.expenseTrackerApi.dtos.CreateExpenseRequest;
 import com.boeani.expenseTrackerApi.dtos.ExpenseResponse;
 import com.boeani.expenseTrackerApi.services.ExpenseService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class ExpenseController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ExpenseResponse createExpense(@RequestBody CreateExpenseRequest expenseRequest, @AuthenticationPrincipal String email) {
+    public ExpenseResponse createExpense(@Valid @RequestBody CreateExpenseRequest expenseRequest, @AuthenticationPrincipal String email) {
         return expenseService.createExpense(expenseRequest, email);
     }
 }

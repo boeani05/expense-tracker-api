@@ -85,4 +85,12 @@ public class ExpenseEndpointTests {
                 .andExpect(jsonPath("$.description").value(TEST_DESCRIPTION))
                 .andExpect(jsonPath("$.expenseDate").value(TEST_DATE.toString()));
     }
+
+    @Test
+    void creatingExpenseWithNullAmountShouldBeRejected() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, null, TEST_CATEGORY, TEST_DESCRIPTION, TEST_DATE))
+                .andExpect(status().isBadRequest());
+    }
 }
