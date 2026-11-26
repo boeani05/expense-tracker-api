@@ -6,14 +6,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 import static com.boeani.expenseTrackerApi.TestData.*;
@@ -27,8 +33,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestcontainersConfiguration.class)
 public class ExpenseEndpointTests {
 
+    @TestConfiguration
+    static class FixedClockConfig {
+
+        @Bean
+        @Primary
+        Clock fixedClock() {
+            return Clock.fixed(Instant.parse("2026-10-01T23:30:00Z"), ZoneOffset.UTC);
+        }
+    }
+
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private Clock clock;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -148,7 +167,15 @@ public class ExpenseEndpointTests {
     void creatingExpenseTomorrowShouldBeRejected() throws Exception {
         String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
-        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, LocalDate.now().plusDays(1)))
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, LocalDate.now(clock).plusDays(1)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void creatingExpenseTodayShouldBeCreated() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, LocalDate.now(clock)))
+                .andExpect(status().isCreated());
     }
 }

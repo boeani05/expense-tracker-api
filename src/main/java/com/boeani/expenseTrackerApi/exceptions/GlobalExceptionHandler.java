@@ -17,4 +17,9 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     void handleInvalidCredentials() {
     }
+
+    @ExceptionHandler(value = ExpenseDateInFutureException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    void handleExpenseDateInFuture() {
+    }
 }
