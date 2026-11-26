@@ -93,4 +93,11 @@ public class ExpenseEndpointTests {
         mockMvc.perform(ExpenseTestRequests.createExpense(jwt, null, TEST_CATEGORY, TEST_DESCRIPTION, TEST_DATE))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void creatingExpenseWithEmptyCategoryShouldBeRejected() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, null, TEST_DESCRIPTION, TEST_DATE));
+    }
 }

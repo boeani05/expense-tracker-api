@@ -36,10 +36,17 @@ public final class ExpenseTestRequests {
                 .content(String.format("""
                         {
                             "amount": %s,
-                            "category": "%s",
+                            "category": %s,
                             "description": "%s",
                             "expenseDate": "%s"
                         }
-                        """, amount, category, description, expenseDate));
+                        """, amount, quoted(category), description, expenseDate));
+    }
+
+    private static String quoted(Object parameter) {
+        if (parameter != null) {
+            return String.format("\"%s\"", parameter);
+        }
+        return "null";
     }
 }
