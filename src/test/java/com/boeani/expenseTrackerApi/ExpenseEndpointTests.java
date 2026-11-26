@@ -117,4 +117,12 @@ public class ExpenseEndpointTests {
         mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, "", TEST_DATE))
                 .andExpect(status().isCreated());
     }
+
+    @Test
+    void creatingExpenseWithNullExpenseDateShouldBeRejected() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, null))
+                .andExpect(status().isBadRequest());
+    }
 }

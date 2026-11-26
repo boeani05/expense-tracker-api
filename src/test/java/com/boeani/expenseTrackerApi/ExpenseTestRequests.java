@@ -38,9 +38,9 @@ public final class ExpenseTestRequests {
                             "amount": %s,
                             "category": %s,
                             "description": %s,
-                            "expenseDate": "%s"
+                            "expenseDate": %s
                         }
-                        """, amount, quoted(category), quoted(description), expenseDate));
+                        """, amount, quoted(category), quoted(description), quoted(expenseDate)));
     }
 
     private static String quoted(Object parameter) {

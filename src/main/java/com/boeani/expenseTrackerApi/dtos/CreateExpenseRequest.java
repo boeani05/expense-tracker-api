@@ -7,5 +7,5 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record CreateExpenseRequest(@NotNull BigDecimal amount, @NotNull Category category, @NotNull String description,
-                                   LocalDate expenseDate) {
+                                   @NotNull LocalDate expenseDate) {
 }
