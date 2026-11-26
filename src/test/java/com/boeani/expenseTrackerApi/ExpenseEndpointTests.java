@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 
 import static com.boeani.expenseTrackerApi.TestData.*;
@@ -123,6 +125,30 @@ public class ExpenseEndpointTests {
         String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
         mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, null))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void creatingExpenseWithZeroAmountShouldBeCreated() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, new BigDecimal("0.00"), TEST_CATEGORY, TEST_DESCRIPTION, TEST_DATE))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void creatingExpenseWithNegativeAmountShouldBeRejected() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, new BigDecimal("-0.01"), TEST_CATEGORY, TEST_DESCRIPTION, TEST_DATE))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void creatingExpenseTomorrowShouldBeRejected() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, LocalDate.now().plusDays(1)))
                 .andExpect(status().isBadRequest());
     }
 }
