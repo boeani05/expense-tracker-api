@@ -23,6 +23,10 @@ public final class ExpenseTestRequests {
     }
 
     public static MockHttpServletRequestBuilder createExpense(String jwt, BigDecimal amount, Category category, String description, LocalDate expenseDate) {
+        return createExpense(jwt, amount, category == null ? null : category.name(), description, expenseDate);
+    }
+
+    public static MockHttpServletRequestBuilder createExpense(String jwt, BigDecimal amount, String category, String description, LocalDate expenseDate) {
         return withExpenseBody(withJwt(post(ENDPOINT), jwt), amount, category, description, expenseDate);
     }
 
@@ -30,7 +34,7 @@ public final class ExpenseTestRequests {
         return requestBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
     }
 
-    private static MockHttpServletRequestBuilder withExpenseBody(MockHttpServletRequestBuilder requestBuilder, BigDecimal amount, Category category, String description, LocalDate expenseDate) {
+    private static MockHttpServletRequestBuilder withExpenseBody(MockHttpServletRequestBuilder requestBuilder, BigDecimal amount, String category, String description, LocalDate expenseDate) {
         return requestBuilder
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.format("""

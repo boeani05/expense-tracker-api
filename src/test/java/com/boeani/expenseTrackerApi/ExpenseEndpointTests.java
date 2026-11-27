@@ -1,5 +1,6 @@
 package com.boeani.expenseTrackerApi;
 
+import com.boeani.expenseTrackerApi.entities.Category;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
@@ -119,7 +120,7 @@ public class ExpenseEndpointTests {
     void creatingExpenseWithNullCategoryShouldBeRejected() throws Exception {
         String jwt = AuthTestHelper.registerAndLogin(mockMvc);
 
-        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, null, TEST_DESCRIPTION, TEST_DATE))
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, (Category) null, TEST_DESCRIPTION, TEST_DATE))
                 .andExpect(status().isBadRequest());
     }
 
@@ -177,5 +178,13 @@ public class ExpenseEndpointTests {
 
         mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, TEST_CATEGORY, TEST_DESCRIPTION, LocalDate.now(clock)))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void creatingExpenseWithNonexistentCategoryShouldBeRejected() throws Exception {
+        String jwt = AuthTestHelper.registerAndLogin(mockMvc);
+
+        mockMvc.perform(ExpenseTestRequests.createExpense(jwt, TEST_AMOUNT, "FOOD", TEST_DESCRIPTION, TEST_DATE))
+                .andExpect(status().isBadRequest());
     }
 }
